@@ -352,8 +352,10 @@ app.post("/send_link_to_email", async (req, res) => {
         console.error(err);
         res.status(500).json({ status: "error", message: err.message });
     } finally {
-        await browser.close();
-        proxy.release();
+        if (browser)
+            await browser.close();
+        if (proxy)
+            proxy.release();
     }
 });
 
@@ -376,8 +378,10 @@ app.post("/vote", async (req, res) => {
         res.status(500).json({ status: "error", message: err.message });
     } finally {
         await new Promise(r => setTimeout(r, 2000));
-        await browser.close();
-        proxy.release();
+        if (browser)
+            await browser.close();
+        if (proxy)
+            proxy.release();
     }
 });
 
