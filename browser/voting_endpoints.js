@@ -1,14 +1,15 @@
 import 'dotenv/config';
 import express from "express";
-import puppeteer from "puppeteer-extra";
+import puppeteer from "puppeteer-core";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import chromium from "@sparticuz/chromium";
 
 import { ProxyProvider } from './proxy_provider.js';
-
 import os from "os";
 import path from "path";
 import crypto from "crypto";
 
+puppeteer.use(StealthPlugin());
 puppeteer.use(StealthPlugin());
 
 const app = express();
@@ -35,7 +36,7 @@ const launchLocalBrowser = async (proxy) => {
         headless: hideBrowser,
         args,
         userDataDir,
-        executablePath: puppeteer.executablePath(),
+        executablePath: await chromium.executablePath(),
     });
     return browser;
   } catch (err) {
