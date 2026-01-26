@@ -24,19 +24,25 @@ const hideBrowser = true;
 
 const randId = () => crypto.randomBytes(8).toString("hex");
 
+// ---------- LAUNCH BROWSER WITH ERROR CATCH ----------
 const launchLocalBrowser = async (proxy) => {
   const args = proxy?.ip ? [`--proxy-server=${proxy.ip}:${proxy.port}`] : [];
 
   const userDataDir = path.join(os.tmpdir(), `puppeteer_dev_profile-${randId()}`);
 
-  const browser = await puppeteer.launch({
-    headless: hideBrowser,
-    args,
-    userDataDir
-  });
-
-  return browser;
+  try {
+    const browser = await puppeteer.launch({
+      headless: hideBrowser,
+      args,
+      userDataDir
+    });
+    return browser;
+  } catch (err) {
+    console.error("Failed to launch Puppeteer browser:", err.message);
+    throw new Error("Browser launch failed. Check dependencies, environment, and Puppeteer config. Original error: " + err.message);
+  }
 };
+// ------------------------------------------------------
 
 const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -266,47 +272,51 @@ const voteForSchoolLink = async (browser, link, proxy) => {
 };
 
 app.post("/send_link_to_email", async (req, res) => {
-  const proxy = await proxyProvider.getProxy();
-  console.log(`Using proxy: ${proxy.ip}`);
+    let proxy;
+    let browser;
+    try {
+        proxy = await proxyProvider.getProxy();
+        console.log(`Using proxy: ${proxy.ip}`);
 
-  const browser = await launchLocalBrowser(proxy);
+        browser = await launchLocalBrowser(proxy);
 
-  const email = req.body.email;
-  console.log("Received email address:", email);
+        const email = req.body.email;
+        console.log("Received email address:", email);
 
-  try {
-    await new Promise(r => setTimeout(r, 2000));
-    await navigateEndSendEmail(browser, email, proxy);
-    res.json({ status: "ok" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ status: "error", message: err.message });
-  } finally {
-    await browser.close();
-    proxy.release();
-  }
+        await new Promise(r => setTimeout(r, 2000));
+        await navigateEndSendEmail(browser, email, proxy);
+        res.json({ status: "ok" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: "error", message: err.message });
+    } finally {
+        await browser.close();
+        proxy.release();
+    }
 });
 
 app.post("/vote", async (req, res) => {
-  const proxy = await proxyProvider.getProxy();
-  console.log(`Using proxy: ${proxy.ip}`);
+    let proxy;
+    let browser;
+    try {
+        proxy = await proxyProvider.getProxy();
+        console.log(`Using proxy: ${proxy.ip}`);
 
-  const browser = await launchLocalBrowser(proxy);
+        browser = await launchLocalBrowser(proxy);
 
-  const { link } = req.body;
-  if (!link) return res.status(400).json({ status: "error", message: "Missing link" });
+        const { link } = req.body;
+        if (!link) return res.status(400).json({ status: "error", message: "Missing link" });
 
-  try {
-    await voteForSchoolLink(browser, link, proxy);
-    res.json({ status: "ok", message: "Upvote clicked successfully!" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ status: "error", message: err.message });
-  } finally {
-    await new Promise(r => setTimeout(r, 2000));
-    await browser.close();
-    proxy.release();
-  }
+        await voteForSchoolLink(browser, link, proxy);
+        res.json({ status: "ok", message: "Upvote clicked successfully!" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: "error", message: err.message });
+    } finally {
+        await new Promise(r => setTimeout(r, 2000));
+        await browser.close();
+        proxy.release();
+    }
 });
 
 app.listen(3000, () => console.log("JS server running on port 3000"));
