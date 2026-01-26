@@ -32,9 +32,10 @@ const launchLocalBrowser = async (proxy) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: hideBrowser,
-      args,
-      userDataDir
+        headless: hideBrowser,
+        args,
+        userDataDir,
+        executablePath: puppeteer.executablePath(),
     });
     return browser;
   } catch (err) {

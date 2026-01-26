@@ -66,8 +66,8 @@ async def send_link_to_email(idx, email, delay=5, retries=3):
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
-                    # "http://localhost:3000/send_link_to_email",
-                    "https://vote-scraper-backend.onrender.com",
+                    "http://localhost:3000/send_link_to_email",
+                    # "https://vote-scraper-backend.onrender.com",
                     json={"email": email}
                 )
                 response.raise_for_status()

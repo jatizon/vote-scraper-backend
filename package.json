@@ -9,5 +9,12 @@
     "puppeteer": "^24.36.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "scripts": {
+    "start": "node browser/voting_endpoints.js",
+    "build": "npm install && npx puppeteer install chrome"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }
