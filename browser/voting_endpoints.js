@@ -271,6 +271,68 @@ const voteForSchoolLink = async (browser, link, proxy) => {
   await clickUpvoteForSchool(page);
 };
 
+
+app.get("/health", async (req, res) => {
+  try {
+    const memoryUsage = process.memoryUsage();
+    const cpuUsage = process.cpuUsage();
+
+    const health = {
+      status: "ok",
+
+      // Processo
+      process: {
+        pid: process.pid,
+        uptime_seconds: Math.floor(process.uptime()),
+        node_version: process.version,
+        env: process.env.NODE_ENV || "unknown",
+      },
+
+      // Sistema
+      system: {
+        platform: process.platform,
+        arch: process.arch,
+        hostname: os.hostname(),
+        loadavg: os.loadavg(), // 1, 5, 15 min
+        cpu_count: os.cpus().length,
+        total_memory_mb: Math.round(os.totalmem() / 1024 / 1024),
+        free_memory_mb: Math.round(os.freemem() / 1024 / 1024),
+      },
+
+      // Memória do Node
+      memory: {
+        rss_mb: Math.round(memoryUsage.rss / 1024 / 1024),
+        heap_total_mb: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+        heap_used_mb: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+        external_mb: Math.round(memoryUsage.external / 1024 / 1024),
+      },
+
+      // CPU do processo
+      cpu: {
+        user_ms: Math.round(cpuUsage.user / 1000),
+        system_ms: Math.round(cpuUsage.system / 1000),
+      },
+
+      // Dependências internas
+      dependencies: {
+        puppeteer: "ok",
+        proxies_loaded: Object.keys(process.env).filter(k => k.startsWith("PROXY_")).length,
+      },
+
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(health);
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+
 app.post("/send_link_to_email", async (req, res) => {
     let proxy;
     let browser;
