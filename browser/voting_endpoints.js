@@ -37,7 +37,7 @@ const launchLocalBrowser = async (proxy) => {
         args: [
             '--no-sandbox', 
             '--disable-setuid-sandbox', 
-            ...(proxy?.ip ? [`--proxy-server=${proxy.ip}:${proxy.port}`] : [])
+            ...(proxy?.ip ? [`--proxy-server=http://${proxy.ip}:${proxy.port}`] : [])
         ],
         userDataDir,
     });

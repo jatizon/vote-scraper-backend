@@ -74,11 +74,6 @@ async def send_link_to_email(idx, email, delay=5, retries=3):
                 print(f"[Inbox {idx}] Sent link to {email}")
                 return
 
-        except httpx.HTTPStatusError as e:
-            print(f"[Inbox {idx}] Send Link Attempt {attempt} failed with HTTP {e.response.status_code}. Retrying in {delay}s...")
-            jittered_delay = get_jitter(delay, attempt)
-            await asyncio.sleep(jittered_delay)
-
         except Exception as e:
             print(f"[Inbox {idx}] Send Link Attempt {attempt} failed: {e}. Retrying in {delay}s...")
             jittered_delay = get_jitter(delay, attempt)
@@ -103,17 +98,12 @@ async def trigger_vote(idx, link, delay=5, retries=3):
                 print(f"[Inbox {idx}] Vote triggered successfully for link: {link}")
                 return
 
-        except httpx.HTTPStatusError as e:
-            print(f"[Inbox {idx}] Trigger Vote Attempt {attempt} failed with HTTP {e.response.status_code}. Retrying in {delay}s...")
-            jittered_delay = get_jitter(delay, attempt)
-            await asyncio.sleep(jittered_delay)
-
         except Exception as e:
             print(f"[Inbox {idx}] Trigger Vote Attempt {attempt} failed: {e}. Retrying in {delay}s...")
             jittered_delay = get_jitter(delay, attempt)
             await asyncio.sleep(jittered_delay)
 
-    raise Exception(f"[Inbox {idx}] Failed to trigger vote for link after {retries} attempts.")
+    raise Exception(f"Failed to trigger vote for link after {retries} attempts.")
 
 # --- Fetch inbox ---
 @with_semaphore(semaphor_endpoints)
@@ -134,18 +124,13 @@ async def poll_inbox(idx, headers, delay=5, retries=3):
             print(f"[Inbox {idx}] Email not found yet. Waiting {delay}s before retrying...")
             jittered_delay = get_jitter(delay, attempt)
             await asyncio.sleep(jittered_delay)
-
-        except httpx.HTTPStatusError as e:
-            print(f"[Inbox {idx}] Poll Inbox Attempt {attempt} failed with HTTP {e.response.status_code}. Retrying in {delay}s...")
-            jittered_delay = get_jitter(delay, attempt)
-            await asyncio.sleep(jittered_delay)
             
         except Exception as e:
             print(f"[Inbox {idx}] Poll Inbox Attempt {attempt} failed: {e}. Retrying in {delay}s...")
             jittered_delay = get_jitter(delay, attempt)
             await asyncio.sleep(jittered_delay)
 
-    raise Exception(f"[Inbox {idx}] Failed to poll inbox after {retries} attempts.")
+    raise Exception(f"Failed to poll inbox after {retries} attempts.")
 
 # --- Monitor progress ---
 async def monitor(progress_q: asyncio.Queue):
@@ -194,9 +179,6 @@ async def main_logic(idx, progress_q: asyncio.Queue):
         await progress_q.put('success')
         print(f"[Inbox {idx}] SUCCESS")
 
-    except httpx.HTTPStatusError as e:
-        await progress_q.put('failure')
-        print(f"[Inbox {idx}] HTTP error: {e.response.status_code} - {str(e)}")
     except Exception as e:
         await progress_q.put('failure')
         print(f"[Inbox {idx}] Unexpected error: {e}")
