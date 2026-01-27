@@ -30,12 +30,16 @@ const launchLocalBrowser = async (proxy) => {
 
   const userDataDir = path.join(os.tmpdir(), `puppeteer_dev_profile-${randId()}`);
 
-  try {
+  try { 
     const browser = await puppeteer.launch({
-        headless: hideBrowser,
-        args,
+        headless: true,
+        executablePath: '/usr/bin/google-chrome-stable',
+        args: [
+            '--no-sandbox', 
+            '--disable-setuid-sandbox', 
+            ...(proxy?.ip ? [`--proxy-server=${proxy.ip}:${proxy.port}`] : [])
+        ],
         userDataDir,
-        executablePath: '/usr/bin/google-chrome-stable'
     });
     return browser;
   } catch (err) {
