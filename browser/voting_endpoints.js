@@ -154,7 +154,7 @@ const waitForEmailInput = async (page) => {
 const fillEmailAndSendLink = async (page, email) => {
   const attemptSend = async () => {
     const submitSelector = 'button[type="submit"]';
-    await page.waitForSelector(submitSelector, { timeout: 20000 });
+    await page.waitForSelector(submitSelector, { timeout: 60000 });
     await page.click(submitSelector);
 
     // Wait for any element containing the success text
@@ -162,7 +162,7 @@ const fillEmailAndSendLink = async (page, email) => {
       const successText = 'check your email';
       return Array.from(document.body.querySelectorAll('*'))
         .some(el => el.innerText && el.innerText.toLowerCase().includes(successText));
-    }, { timeout: 10000 });
+    }, { timeout: 60000 });
   };
 
   try {
@@ -221,7 +221,7 @@ const launchVotingPage = async (browser, link, proxy) => {
         link,
         {
             waitUntil: "domcontentloaded",
-            timeout: 20000
+            timeout: 60000
         }
         );
     } catch (e) {
@@ -234,7 +234,7 @@ const launchVotingPage = async (browser, link, proxy) => {
 const clickUpvoteForSchool = async (page) => {
   const schoolSelector = 'p.font-semibold.text-foreground.truncate.text-sm.sm\\:text-base';
 
-  await page.waitForSelector(schoolSelector, { timeout: 45000 });
+  await page.waitForSelector(schoolSelector, { timeout: 60000 });
 
   try {
     const clicked = await page.$eval(
