@@ -1,6 +1,6 @@
 # voting-bot
 
-Small Node server that automates voting for ITA (Instituto Tecnológico de Aeronáutica) on the Lovable for Schools site. It uses Puppeteer with a stealth plugin so the browser automation isn’t obvious, and can rotate through proxies so requests don’t all come from the same IP.
+Small Node server that automates voting for ITA (Instituto Tecnológico de Aeronáutica) on the Lovable for Schools challenge. It uses Puppeteer with a stealth plugin so the browser automation isn’t obvious, and can rotate through proxies so requests don’t all come from the same IP.
 
 **Requirements:** Node 18+, Chrome/Chromium (the code expects `/usr/bin/google-chrome-stable`; change `executablePath` in `browser/voting_endpoints.js` if yours is elsewhere).
 
